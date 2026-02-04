@@ -121,22 +121,19 @@ app.get(
   },
 );
 
-app.get(
-  "/public/test/:name/info",
-  {
-    schema: {
-      params: z.object({ name: z.string() }),
-    },
-  },
-  async (req, reply) => {
-    const test = await prisma.test.findUnique({
-      where: { name: req.params.name },
-      include: { files: true },
-    });
-    return test || reply.status(404).send({ error: "Not found" });
-  },
-);
-
+app.get("/public/test/list", async (req, reply) => {
+  const tests = await prisma.test.findMany({
+    include: { files: true },
+    orderBy: { startedAt: "desc" },
+  });
+  return tests.map((t) => ({
+    id: t.id,
+    name: t.name,
+    startedAt: t.startedAt,
+    finishedAt: t.finishedAt,
+    files: t.files.map((f) => ({ id: f.id, originalName: f.originalName, path: f.path })),
+  }));
+});
 app
   .listen({ host:"0.0.0.0", port: 3000 })
   .then(() => console.log("Server running on port 3000"));
