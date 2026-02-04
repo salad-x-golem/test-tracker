@@ -9,22 +9,31 @@ import multipart from "@fastify/multipart";
 import fs from "node:fs";
 import path from "node:path";
 import { pipeline } from "node:stream/promises";
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
-import { PrismaClient } from './generated/client.js';
+import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaClient } from "./generated/client.js";
 
-const upload_path = process.env.UPLOAD_PATH || "uploads"
+const upload_path = process.env.UPLOAD_PATH || path.join(__dirname, "uploads");
+
+try {
+  if (!fs.existsSync(upload_path)) {
+    fs.mkdirSync(upload_path, { recursive: true });
+  }
+} catch (err) {
+  console.error("Failed to ensure upload directory:", err);
+  process.exit(1);
+}
 
 // Ensure you have access to process.env
 const dbPath = process.env.DATABASE_PATH || "./test-tracker.db";
 
 // Better-SQLite3 likes a clean path, but Prisma's URL needs the 'file:' prefix
-const connectionUrl = dbPath.startsWith('file:') ? dbPath : `file:${dbPath}`;
+const connectionUrl = dbPath.startsWith("file:") ? dbPath : `file:${dbPath}`;
 
 const adapter = new PrismaBetterSqlite3({
-  url: connectionUrl
+  url: connectionUrl,
 });
 
-const prisma = new PrismaClient({ adapter })
+const prisma = new PrismaClient({ adapter });
 
 const app = Fastify().withTypeProvider<ZodTypeProvider>();
 
@@ -81,11 +90,7 @@ app.post("/test/:name/upload/file", async (req, reply) => {
   const test = await prisma.test.findUnique({ where: { name } });
   if (!test) return reply.status(404).send({ error: "Test not found" });
 
-  const filePath = path.join(
-    __dirname,
-    upload_path,
-    `${data.filename}`,
-  );
+  const filePath = path.join(upload_path, `${data.filename}`);
   await pipeline(data.file, fs.createWriteStream(filePath));
 
   await prisma.file.create({
