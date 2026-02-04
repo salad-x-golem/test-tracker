@@ -1,0 +1,28 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output = "../src/generated"
+
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Test {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  startedAt DateTime  @default(now())
+  finishedAt DateTime?
+  files     File[]
+}
+
+model File {
+  id           Int      @id @default(autoincrement())
+  originalName String
+  path         String
+  test         Test     @relation(fields: [testId], references: [id])
+  testId       Int
+}

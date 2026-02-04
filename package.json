@@ -1,0 +1,40 @@
+{
+  "name": "test-tracker",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "src/server.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "start-bun": "bun src/server.ts",
+    "dev": "tsx watch src/server.ts",
+    "fmt": "prettier --write .",
+    "lint": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/salad-x-golem/test-tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/salad-x-golem/test-tracker/issues"
+  },
+  "dependencies": {
+    "@fastify/multipart": "^9.4.0",
+    "@prisma/adapter-better-sqlite3": "^7.3.0",
+    "@prisma/client": "^7.3.0",
+    "fastify": "^5.7.4",
+    "fastify-type-provider-zod": "^6.1.0",
+    "prettier": "^3.8.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.0",
+    "prisma": "^7.3.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
