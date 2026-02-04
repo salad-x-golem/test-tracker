@@ -131,9 +131,13 @@ app.get("/public/test/list", async (req, reply) => {
     name: t.name,
     startedAt: t.startedAt,
     finishedAt: t.finishedAt,
-    files: t.files.map((f) => ({ id: f.id, originalName: f.originalName, path: f.path })),
+    files: t.files.map((f) => ({
+      id: f.id,
+      originalName: f.originalName,
+      path: f.path,
+    })),
   }));
 });
 app
-  .listen({ host:"0.0.0.0", port: 3000 })
+  .listen({ host: "0.0.0.0", port: 3000 })
   .then(() => console.log("Server running on port 3000"));
