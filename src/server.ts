@@ -12,9 +12,18 @@ import { pipeline } from "node:stream/promises";
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import { PrismaClient } from './generated/client.js';
 
+const upload_path = process.env.UPLOAD_PATH || "uploads"
+
+// Ensure you have access to process.env
+const dbPath = process.env.DATABASE_PATH || "./test-tracker.db";
+
+// Better-SQLite3 likes a clean path, but Prisma's URL needs the 'file:' prefix
+const connectionUrl = dbPath.startsWith('file:') ? dbPath : `file:${dbPath}`;
+
 const adapter = new PrismaBetterSqlite3({
-  url: "file:./test-tracker.db"
-})
+  url: connectionUrl
+});
+
 const prisma = new PrismaClient({ adapter })
 
 const app = Fastify().withTypeProvider<ZodTypeProvider>();
@@ -74,8 +83,8 @@ app.post("/test/:name/upload/file", async (req, reply) => {
 
   const filePath = path.join(
     __dirname,
-    "uploads",
-    `${Date.now()}-${data.filename}`,
+    upload_path,
+    `${data.filename}`,
   );
   await pipeline(data.file, fs.createWriteStream(filePath));
 
