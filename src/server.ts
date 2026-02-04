@@ -131,6 +131,7 @@ app.get("/public/test/list", async (req, reply) => {
     name: t.name,
     startedAt: t.startedAt,
     finishedAt: t.finishedAt,
+    params: t.parameters,
     files: t.files.map((f) => ({
       id: f.id,
       originalName: f.originalName,
