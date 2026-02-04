@@ -48,7 +48,7 @@ app.register(multipart);
 
 // 1. Start Test
 app.post(
-  "/test/started",
+  "/test/new",
   {
     schema: {
       body: z.object({ name: z.string() }),
@@ -60,7 +60,7 @@ app.post(
       update: { startedAt: new Date(), finishedAt: null },
       create: { name: req.body.name },
     });
-    return { message: `Test ${test.name} started`, id: test.id };
+    return { message: `Test ${test.name} created`, id: test.id };
   },
 );
 
