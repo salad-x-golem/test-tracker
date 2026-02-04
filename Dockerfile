@@ -36,7 +36,7 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
 # Install ONLY production dependencies (ignores devDependencies)
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Use an unprivileged user for better security
 USER node
