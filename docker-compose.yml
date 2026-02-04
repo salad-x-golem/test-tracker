@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: backend_api
     ports:
-      - "3000:3000"
+      - "10347:3000"
     volumes:
       # This persists your SQLite DB and your uploads
       - ./test-tracker-data:/app/test-tracker-data
