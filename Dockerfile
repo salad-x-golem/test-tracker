@@ -38,4 +38,4 @@ RUN npm ci --only=production
 USER node
 
 # Start the application
-CMD ["node", "dist/server.js"]
+CMD ["npm", "run", "start"]
