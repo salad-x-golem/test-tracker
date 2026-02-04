@@ -106,7 +106,23 @@ app.post("/test/:name/upload/file", async (req, reply) => {
 
 // 4. Get Info
 app.get(
-  "/test/:name/info",
+  "/public/test/:name/info",
+  {
+    schema: {
+      params: z.object({ name: z.string() }),
+    },
+  },
+  async (req, reply) => {
+    const test = await prisma.test.findUnique({
+      where: { name: req.params.name },
+      include: { files: true },
+    });
+    return test || reply.status(404).send({ error: "Not found" });
+  },
+);
+
+app.get(
+  "/public/test/:name/info",
   {
     schema: {
       params: z.object({ name: z.string() }),
