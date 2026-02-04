@@ -13,7 +13,8 @@ datasource db {
 model Test {
   id        Int       @id @default(autoincrement())
   name      String    @unique
-  startedAt DateTime  @default(now())
+  createdAt DateTime  @default(now())
+  startedAt DateTime?
   finishedAt DateTime?
   files     File[]
   parameters String

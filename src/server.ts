@@ -55,12 +55,27 @@ app.post(
     },
   },
   async (req, reply) => {
-    const test = await prisma.test.upsert({
-      where: { name: req.body.name },
-      update: { startedAt: new Date(), finishedAt: null, parameters: req.body.params },
-      create: { name: req.body.name, parameters: req.body.params },
+    const test = await prisma.test.create({
+      data: { name: req.body.name, parameters: req.body.params },
     });
     return { message: `Test ${test.name} created`, id: test.id };
+  },
+);
+
+// 1. Start Test
+app.post(
+  "/test/start",
+  {
+    schema: {
+      body: z.object({ name: z.string() }),
+    },
+  },
+  async (req, reply) => {
+    const test = await prisma.test.update({
+      where: { name: req.body.name, startedAt: null },
+      data: { startedAt: new Date(), finishedAt: null },
+    });
+    return { message: `Test ${test.name} started`, id: test.id };
   },
 );
 

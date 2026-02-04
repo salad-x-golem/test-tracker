@@ -2,8 +2,10 @@
 CREATE TABLE "Test" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "name" TEXT NOT NULL,
-    "startedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "finishedAt" DATETIME
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "startedAt" DATETIME,
+    "finishedAt" DATETIME,
+    "parameters" TEXT NOT NULL
 );
 
 -- CreateTable
