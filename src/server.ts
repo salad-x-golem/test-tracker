@@ -51,14 +51,14 @@ app.post(
   "/test/new",
   {
     schema: {
-      body: z.object({ name: z.string() }),
+      body: z.object({ name: z.string(), parameters: z.string() }),
     },
   },
   async (req, reply) => {
     const test = await prisma.test.upsert({
       where: { name: req.body.name },
-      update: { startedAt: new Date(), finishedAt: null },
-      create: { name: req.body.name },
+      update: { startedAt: new Date(), finishedAt: null, parameters: req.body.parameters },
+      create: { name: req.body.name, parameters: req.body.parameters },
     });
     return { message: `Test ${test.name} created`, id: test.id };
   },

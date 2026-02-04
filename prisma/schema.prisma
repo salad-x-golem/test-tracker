@@ -16,6 +16,7 @@ model Test {
   startedAt DateTime  @default(now())
   finishedAt DateTime?
   files     File[]
+  parameters String
 }
 
 model File {

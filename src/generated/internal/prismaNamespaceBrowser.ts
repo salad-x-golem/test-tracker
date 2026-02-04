@@ -72,7 +72,8 @@ export const TestScalarFieldEnum = {
   id: 'id',
   name: 'name',
   startedAt: 'startedAt',
-  finishedAt: 'finishedAt'
+  finishedAt: 'finishedAt',
+  parameters: 'parameters'
 } as const
 
 export type TestScalarFieldEnum = (typeof TestScalarFieldEnum)[keyof typeof TestScalarFieldEnum]

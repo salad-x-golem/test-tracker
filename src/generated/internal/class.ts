@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.3.0",
   "engineVersion": "9d6ad21cbbceab97458517b147a6a09ff43aa735",
   "activeProvider": "sqlite",
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n}\n\nmodel Test {\n  id         Int       @id @default(autoincrement())\n  name       String    @unique\n  startedAt  DateTime  @default(now())\n  finishedAt DateTime?\n  files      File[]\n}\n\nmodel File {\n  id           Int    @id @default(autoincrement())\n  originalName String\n  path         String\n  test         Test   @relation(fields: [testId], references: [id])\n  testId       Int\n}\n",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n}\n\nmodel Test {\n  id         Int       @id @default(autoincrement())\n  name       String    @unique\n  startedAt  DateTime  @default(now())\n  finishedAt DateTime?\n  files      File[]\n  parameters String\n}\n\nmodel File {\n  id           Int    @id @default(autoincrement())\n  originalName String\n  path         String\n  test         Test   @relation(fields: [testId], references: [id])\n  testId       Int\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -28,7 +28,7 @@ const config: runtime.GetPrismaClientConfig = {
   }
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Test\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"startedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"finishedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"files\",\"kind\":\"object\",\"type\":\"File\",\"relationName\":\"FileToTest\"}],\"dbName\":null},\"File\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"originalName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"path\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"test\",\"kind\":\"object\",\"type\":\"Test\",\"relationName\":\"FileToTest\"},{\"name\":\"testId\",\"kind\":\"scalar\",\"type\":\"Int\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Test\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"startedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"finishedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"files\",\"kind\":\"object\",\"type\":\"File\",\"relationName\":\"FileToTest\"},{\"name\":\"parameters\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null},\"File\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"originalName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"path\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"test\",\"kind\":\"object\",\"type\":\"Test\",\"relationName\":\"FileToTest\"},{\"name\":\"testId\",\"kind\":\"scalar\",\"type\":\"Int\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 
 async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Module> {
   const { Buffer } = await import('node:buffer')

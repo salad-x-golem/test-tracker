@@ -39,6 +39,7 @@ export type TestMinAggregateOutputType = {
   name: string | null
   startedAt: Date | null
   finishedAt: Date | null
+  parameters: string | null
 }
 
 export type TestMaxAggregateOutputType = {
@@ -46,6 +47,7 @@ export type TestMaxAggregateOutputType = {
   name: string | null
   startedAt: Date | null
   finishedAt: Date | null
+  parameters: string | null
 }
 
 export type TestCountAggregateOutputType = {
@@ -53,6 +55,7 @@ export type TestCountAggregateOutputType = {
   name: number
   startedAt: number
   finishedAt: number
+  parameters: number
   _all: number
 }
 
@@ -70,6 +73,7 @@ export type TestMinAggregateInputType = {
   name?: true
   startedAt?: true
   finishedAt?: true
+  parameters?: true
 }
 
 export type TestMaxAggregateInputType = {
@@ -77,6 +81,7 @@ export type TestMaxAggregateInputType = {
   name?: true
   startedAt?: true
   finishedAt?: true
+  parameters?: true
 }
 
 export type TestCountAggregateInputType = {
@@ -84,6 +89,7 @@ export type TestCountAggregateInputType = {
   name?: true
   startedAt?: true
   finishedAt?: true
+  parameters?: true
   _all?: true
 }
 
@@ -178,6 +184,7 @@ export type TestGroupByOutputType = {
   name: string
   startedAt: Date
   finishedAt: Date | null
+  parameters: string
   _count: TestCountAggregateOutputType | null
   _avg: TestAvgAggregateOutputType | null
   _sum: TestSumAggregateOutputType | null
@@ -208,6 +215,7 @@ export type TestWhereInput = {
   name?: Prisma.StringFilter<"Test"> | string
   startedAt?: Prisma.DateTimeFilter<"Test"> | Date | string
   finishedAt?: Prisma.DateTimeNullableFilter<"Test"> | Date | string | null
+  parameters?: Prisma.StringFilter<"Test"> | string
   files?: Prisma.FileListRelationFilter
 }
 
@@ -216,6 +224,7 @@ export type TestOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   finishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  parameters?: Prisma.SortOrder
   files?: Prisma.FileOrderByRelationAggregateInput
 }
 
@@ -227,6 +236,7 @@ export type TestWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.TestWhereInput | Prisma.TestWhereInput[]
   startedAt?: Prisma.DateTimeFilter<"Test"> | Date | string
   finishedAt?: Prisma.DateTimeNullableFilter<"Test"> | Date | string | null
+  parameters?: Prisma.StringFilter<"Test"> | string
   files?: Prisma.FileListRelationFilter
 }, "id" | "name">
 
@@ -235,6 +245,7 @@ export type TestOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   finishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  parameters?: Prisma.SortOrder
   _count?: Prisma.TestCountOrderByAggregateInput
   _avg?: Prisma.TestAvgOrderByAggregateInput
   _max?: Prisma.TestMaxOrderByAggregateInput
@@ -250,12 +261,14 @@ export type TestScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Test"> | string
   startedAt?: Prisma.DateTimeWithAggregatesFilter<"Test"> | Date | string
   finishedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Test"> | Date | string | null
+  parameters?: Prisma.StringWithAggregatesFilter<"Test"> | string
 }
 
 export type TestCreateInput = {
   name: string
   startedAt?: Date | string
   finishedAt?: Date | string | null
+  parameters: string
   files?: Prisma.FileCreateNestedManyWithoutTestInput
 }
 
@@ -264,6 +277,7 @@ export type TestUncheckedCreateInput = {
   name: string
   startedAt?: Date | string
   finishedAt?: Date | string | null
+  parameters: string
   files?: Prisma.FileUncheckedCreateNestedManyWithoutTestInput
 }
 
@@ -271,6 +285,7 @@ export type TestUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  parameters?: Prisma.StringFieldUpdateOperationsInput | string
   files?: Prisma.FileUpdateManyWithoutTestNestedInput
 }
 
@@ -279,6 +294,7 @@ export type TestUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  parameters?: Prisma.StringFieldUpdateOperationsInput | string
   files?: Prisma.FileUncheckedUpdateManyWithoutTestNestedInput
 }
 
@@ -287,12 +303,14 @@ export type TestCreateManyInput = {
   name: string
   startedAt?: Date | string
   finishedAt?: Date | string | null
+  parameters: string
 }
 
 export type TestUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  parameters?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type TestUncheckedUpdateManyInput = {
@@ -300,6 +318,7 @@ export type TestUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  parameters?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type TestCountOrderByAggregateInput = {
@@ -307,6 +326,7 @@ export type TestCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   finishedAt?: Prisma.SortOrder
+  parameters?: Prisma.SortOrder
 }
 
 export type TestAvgOrderByAggregateInput = {
@@ -318,6 +338,7 @@ export type TestMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   finishedAt?: Prisma.SortOrder
+  parameters?: Prisma.SortOrder
 }
 
 export type TestMinOrderByAggregateInput = {
@@ -325,6 +346,7 @@ export type TestMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   finishedAt?: Prisma.SortOrder
+  parameters?: Prisma.SortOrder
 }
 
 export type TestSumOrderByAggregateInput = {
@@ -374,6 +396,7 @@ export type TestCreateWithoutFilesInput = {
   name: string
   startedAt?: Date | string
   finishedAt?: Date | string | null
+  parameters: string
 }
 
 export type TestUncheckedCreateWithoutFilesInput = {
@@ -381,6 +404,7 @@ export type TestUncheckedCreateWithoutFilesInput = {
   name: string
   startedAt?: Date | string
   finishedAt?: Date | string | null
+  parameters: string
 }
 
 export type TestCreateOrConnectWithoutFilesInput = {
@@ -403,6 +427,7 @@ export type TestUpdateWithoutFilesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  parameters?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type TestUncheckedUpdateWithoutFilesInput = {
@@ -410,6 +435,7 @@ export type TestUncheckedUpdateWithoutFilesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  parameters?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -448,6 +474,7 @@ export type TestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   name?: boolean
   startedAt?: boolean
   finishedAt?: boolean
+  parameters?: boolean
   files?: boolean | Prisma.Test$filesArgs<ExtArgs>
   _count?: boolean | Prisma.TestCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["test"]>
@@ -457,6 +484,7 @@ export type TestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   name?: boolean
   startedAt?: boolean
   finishedAt?: boolean
+  parameters?: boolean
 }, ExtArgs["result"]["test"]>
 
 export type TestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -464,6 +492,7 @@ export type TestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   name?: boolean
   startedAt?: boolean
   finishedAt?: boolean
+  parameters?: boolean
 }, ExtArgs["result"]["test"]>
 
 export type TestSelectScalar = {
@@ -471,9 +500,10 @@ export type TestSelectScalar = {
   name?: boolean
   startedAt?: boolean
   finishedAt?: boolean
+  parameters?: boolean
 }
 
-export type TestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "startedAt" | "finishedAt", ExtArgs["result"]["test"]>
+export type TestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "startedAt" | "finishedAt" | "parameters", ExtArgs["result"]["test"]>
 export type TestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   files?: boolean | Prisma.Test$filesArgs<ExtArgs>
   _count?: boolean | Prisma.TestCountOutputTypeDefaultArgs<ExtArgs>
@@ -491,6 +521,7 @@ export type $TestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     name: string
     startedAt: Date
     finishedAt: Date | null
+    parameters: string
   }, ExtArgs["result"]["test"]>
   composites: {}
 }
@@ -919,6 +950,7 @@ export interface TestFieldRefs {
   readonly name: Prisma.FieldRef<"Test", 'String'>
   readonly startedAt: Prisma.FieldRef<"Test", 'DateTime'>
   readonly finishedAt: Prisma.FieldRef<"Test", 'DateTime'>
+  readonly parameters: Prisma.FieldRef<"Test", 'String'>
 }
     
 
