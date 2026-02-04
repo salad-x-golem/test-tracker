@@ -33,6 +33,7 @@ COPY --from=builder /app/package*.json ./
 
 # 3. copy prisma schema and migrations
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
 # Install ONLY production dependencies (ignores devDependencies)
 RUN npm ci --only=production
