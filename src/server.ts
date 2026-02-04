@@ -66,7 +66,7 @@ app.post(
 
 // 2. Finish Test
 app.post(
-  "/test/finished",
+  "/test/finish",
   {
     schema: {
       body: z.object({ name: z.string() }),
