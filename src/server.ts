@@ -144,6 +144,7 @@ app.get("/public/test/list", async (req, reply) => {
   return tests.map((t) => ({
     id: t.id,
     name: t.name,
+    createdAt: t.createdAt,
     startedAt: t.startedAt,
     finishedAt: t.finishedAt,
     params: t.parameters,
