@@ -142,10 +142,6 @@ app.post(
     "/public/test/run",
     {
       schema: {
-        // 'name' comes from the URL path: /public/test/run/my-workflow.yml
-        params: z.object({
-          name: z.string().describe("The workflow filename (e.g., 'main.yml')")
-        }),
         // Inputs for the workflow are passed in the JSON body
         body: z.object({
           timeout_minutes: z.string().default("5"),
@@ -163,14 +159,13 @@ app.post(
       },
     },
     async (request, reply) => {
-      const { name } = request.params;
       const inputs = request.body;
 
       try {
         await octokit.actions.createWorkflowDispatch({
           owner: "salad-x-golem",
           repo: "arkiv-setup",
-          workflow_id: name,
+          workflow_id: "l2-arkiv.yml",
           ref: "main", // or request.body.ref if you want it dynamic
           inputs: {
             ...inputs,
