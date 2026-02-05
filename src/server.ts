@@ -188,7 +188,7 @@ app.get(
 app.get("/public/test/list", async (req, reply) => {
   const tests = await prisma.test.findMany({
     include: { files: true },
-    orderBy: { startedAt: "desc" },
+    orderBy: { createdAt: "desc" },
   });
   return tests.map((t) => ({
     id: t.id,
