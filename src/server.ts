@@ -11,7 +11,9 @@ import path from "node:path";
 import { pipeline } from "node:stream/promises";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { PrismaClient } from "./generated/client.js";
+import { Octokit } from "@octokit/rest";
 
+const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 const upload_path = process.env.UPLOAD_PATH || path.join(__dirname, "uploads");
 
 try {
@@ -135,6 +137,61 @@ app.post("/test/:name/upload/file", async (req, reply) => {
 
   return { message: "File uploaded successfully" };
 });
+
+app.post(
+    "/public/test/run",
+    {
+      schema: {
+        // 'name' comes from the URL path: /public/test/run/my-workflow.yml
+        params: z.object({
+          name: z.string().describe("The workflow filename (e.g., 'main.yml')")
+        }),
+        // Inputs for the workflow are passed in the JSON body
+        body: z.object({
+          timeout_minutes: z.string().default("5"),
+          workers: z.string().default('["zeus"]'),
+          arkiv_op_geth: z.string().default("v1.101605.0-1.2"),
+          test_length: z.string().default("60"),
+          block_every: z.string().default("1s"),
+          block_limit: z.string().default("60000000"),
+          test_scenario: z.string().default("dc_write_only"),
+        }),
+        response: {
+          204: z.object({ message: z.string() }),
+          500: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const { name } = request.params;
+      const inputs = request.body;
+
+      try {
+        await octokit.actions.createWorkflowDispatch({
+          owner: "salad-x-golem",
+          repo: "arkiv-setup",
+          workflow_id: name,
+          ref: "main", // or request.body.ref if you want it dynamic
+          inputs: {
+            ...inputs,
+            // Mapping the hyphenated YAML keys to the underscore-friendly Zod keys
+            "arkiv-op-geth": inputs.arkiv_op_geth,
+            "test-length": inputs.test_length,
+            "block-every": inputs.block_every,
+            "block-limit": inputs.block_limit,
+            "test-scenario": inputs.test_scenario,
+          },
+        });
+
+        return reply.code(204).send({
+          message: `Workflow ${name} triggered successfully`
+        });
+      } catch (error: any) {
+        request.log.error(error);
+        return reply.code(500).send({ error: "Failed to trigger workflow" });
+      }
+    }
+);
 
 // 4. Get Info
 app.get(

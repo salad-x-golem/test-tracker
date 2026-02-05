@@ -12,3 +12,4 @@ services:
     environment:
       - DATABASE_PATH=file:/app/test-tracker-data/test-tracker.sqlite
       - UPLOAD_PATH=/app/test-tracker-data/uploads
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
