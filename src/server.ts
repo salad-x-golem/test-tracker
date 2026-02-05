@@ -105,7 +105,21 @@ app.post("/test/:name/upload/file", async (req, reply) => {
   const test = await prisma.test.findUnique({ where: { name } });
   if (!test) return reply.status(404).send({ error: "Test not found" });
 
-  const filePath = path.join(upload_path, `${data.filename}`);
+  const safeName = name.replace(/[^a-zA-Z0-9-_]/g, "_");
+  const testDir = path.join(upload_path, safeName);
+  try {
+    if (!fs.existsSync(testDir)) {
+      fs.mkdirSync(testDir, { recursive: true });
+    }
+  } catch (err) {
+    req.log?.error?.(err);
+    return reply
+      .status(500)
+      .send({ error: "Failed to create upload directory" });
+  }
+
+  const filename = path.basename(data.filename || "upload");
+  const filePath = path.join(testDir, filename);
   await pipeline(data.file, fs.createWriteStream(filePath));
 
   await prisma.file.create({
@@ -136,6 +150,38 @@ app.get(
   },
 );
 
+// Download file by id
+app.get(
+  "/public/file/:id/download",
+  {
+    schema: {
+      params: z.object({ id: z.string() }),
+    },
+  },
+  async (req, reply) => {
+    const { id } = req.params as { id: string };
+
+    // Support numeric IDs and string/UUID IDs
+    const numericId = /^\d+$/.test(id) ? Number(id) : undefined;
+    const where: any = numericId !== undefined ? { id: numericId } : { id };
+
+    const file = await prisma.file.findUnique({ where });
+    if (!file) return reply.status(404).send({ error: "File not found" });
+
+    if (!fs.existsSync(file.path)) {
+      return reply.status(404).send({ error: "File is missing on disk" });
+    }
+
+    const filename = file.originalName
+      ? path.basename(file.originalName)
+      : path.basename(file.path);
+    reply.header("Content-Disposition", `attachment; filename="${filename}"`);
+
+    const stream = fs.createReadStream(file.path);
+    return reply.send(stream);
+  },
+);
+
 app.get("/public/test/list", async (req, reply) => {
   const tests = await prisma.test.findMany({
     include: { files: true },
@@ -151,7 +197,6 @@ app.get("/public/test/list", async (req, reply) => {
     files: t.files.map((f) => ({
       id: f.id,
       originalName: f.originalName,
-      path: f.path,
     })),
   }));
 });
