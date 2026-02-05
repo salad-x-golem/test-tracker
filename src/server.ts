@@ -42,7 +42,11 @@ app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
 // Support for file uploads
-app.register(multipart);
+app.register(multipart, {
+  limits: {
+    fileSize: 1024 * 1024 * 1024,
+  },
+});
 
 // --- ENDPOINTS ---
 
