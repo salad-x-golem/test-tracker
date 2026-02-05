@@ -105,8 +105,7 @@ app.post("/test/:name/upload/file", async (req, reply) => {
   const test = await prisma.test.findUnique({ where: { name } });
   if (!test) return reply.status(404).send({ error: "Test not found" });
 
-  const safeName = name.replace(/[^a-zA-Z0-9-_]/g, "_");
-  const testDir = path.join(upload_path, safeName);
+  const testDir = path.join(upload_path, test.name);
   try {
     if (!fs.existsSync(testDir)) {
       fs.mkdirSync(testDir, { recursive: true });
