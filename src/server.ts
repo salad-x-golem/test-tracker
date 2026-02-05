@@ -160,12 +160,12 @@ app.post(
     },
     async (request, reply) => {
       const inputs = request.body;
-
+      const actionName = "l2-arkiv.yml";
       try {
         await octokit.actions.createWorkflowDispatch({
           owner: "salad-x-golem",
           repo: "arkiv-setup",
-          workflow_id: "l2-arkiv.yml",
+          workflow_id: actionName,
           ref: "main", // or request.body.ref if you want it dynamic
           inputs: {
             ...inputs,
@@ -179,7 +179,7 @@ app.post(
         });
 
         return reply.code(204).send({
-          message: `Workflow ${name} triggered successfully`
+          message: `Workflow ${actionName} triggered successfully`
         });
       } catch (error: any) {
         request.log.error(error);
