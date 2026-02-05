@@ -182,8 +182,7 @@ app.post(
           message: `Workflow ${actionName} triggered successfully`
         });
       } catch (error: any) {
-        request.log.error(error);
-        return reply.code(500).send({ error: "Failed to trigger workflow" });
+        return reply.code(500).send({ error: `Failed to trigger workflow ${error}` });
       }
     }
 );
