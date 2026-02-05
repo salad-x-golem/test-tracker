@@ -144,13 +144,13 @@ app.post(
       schema: {
         // Inputs for the workflow are passed in the JSON body
         body: z.object({
-          timeout_minutes: z.string().default("5"),
+          timeoutMinutes: z.string().default("5"),
           workers: z.string().default('["zeus"]'),
-          arkiv_op_geth: z.string().default("v1.101605.0-1.2"),
-          test_length: z.string().default("60"),
-          block_every: z.string().default("1s"),
-          block_limit: z.string().default("60000000"),
-          test_scenario: z.string().default("dc_write_only"),
+          arkivOpGeth: z.string().default("v1.101605.0-1.2"),
+          testLength: z.number().default(60),
+          blockEvery: z.number().default(1),
+          blockLimit: z.number().default(60000000),
+          testScenario: z.string().default("dc_write_only"),
         }),
         response: {
           204: z.object({ message: z.string() }),
@@ -170,11 +170,11 @@ app.post(
           inputs: {
             ...inputs,
             // Mapping the hyphenated YAML keys to the underscore-friendly Zod keys
-            "arkiv-op-geth": inputs.arkiv_op_geth,
-            "test-length": inputs.test_length,
-            "block-every": inputs.block_every,
-            "block-limit": inputs.block_limit,
-            "test-scenario": inputs.test_scenario,
+            "arkiv-op-geth": inputs.arkivOpGeth,
+            "test-length": inputs.testLength,
+            "block-every": inputs.blockEvery,
+            "block-limit": inputs.blockLimit,
+            "test-scenario": inputs.testScenario,
           },
         });
 
