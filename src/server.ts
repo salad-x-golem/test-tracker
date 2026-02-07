@@ -74,6 +74,18 @@ app.register(multipart, {
   },
 });
 
+
+export type TestParams = {
+  runsOn: string;
+  testLength: number;
+  blockEvery: number;
+  arkivOpGeth: string;
+  blockLimit: number;
+  testScenario: string;
+  isExternal?: boolean;
+  externalRpcUrl?: string;
+}
+
 // --- ENDPOINTS ---
 
 // 1. Start Test
@@ -85,10 +97,13 @@ app.post(
     },
   },
   async (req, reply) => {
+    const params: TestParams = JSON.parse(req.body.params);
+
+    const name = `${params.runsOn}-${params.testScenario}-${params.isExternal ? "ext" : "int"}-${Date.now()}`;
     const test = await prisma.test.create({
-      data: { name: req.body.name, parameters: req.body.params },
+      data: { name: name, parameters: req.body.params },
     });
-    return { message: `Test ${test.name} created`, id: test.id };
+    return { message: `Test ${test.name} created`, id: test.id, name: name };
   },
 );
 
