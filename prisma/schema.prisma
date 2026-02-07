@@ -22,6 +22,7 @@ model Test {
 
 model File {
   id           Int      @id @default(autoincrement())
+  uid          String   @unique
   originalName String
   path         String
   test         Test     @relation(fields: [testId], references: [id])

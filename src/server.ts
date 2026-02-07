@@ -13,23 +13,21 @@ import { timingSafeEqual } from "node:crypto";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { PrismaClient } from "./generated/client.js";
 import { Octokit } from "@octokit/rest";
+import { randomUUID } from "node:crypto";
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 const upload_path = process.env.UPLOAD_PATH || path.join(__dirname, "uploads");
 const bearerToken = process.env.BEARER_TOKEN;
 
-async function bearerAuthHook(
-  request: FastifyRequest,
-  reply: FastifyReply,
-) {
+async function bearerAuthHook(request: FastifyRequest, reply: FastifyReply) {
   if (!bearerToken) {
-    return reply
-      .code(401)
-      .send({ error: "Authentication is not configured" });
+    return reply.code(401).send({ error: "Authentication is not configured" });
   }
   const auth = request.headers.authorization;
   if (!auth || !auth.startsWith("Bearer ")) {
-    return reply.code(401).send({ error: "Missing or invalid authorization header" });
+    return reply
+      .code(401)
+      .send({ error: "Missing or invalid authorization header" });
   }
   const token = auth.slice("Bearer ".length);
   const tokenBuffer = Buffer.from(token);
@@ -158,6 +156,7 @@ app.post("/test/:name/upload/file", async (req, reply) => {
       originalName: data.filename,
       path: filePath,
       testId: test.id,
+      uid: randomUUID(),
     },
   });
 
@@ -165,53 +164,55 @@ app.post("/test/:name/upload/file", async (req, reply) => {
 });
 
 app.post(
-    "/public/test/run",
-    {
-      preHandler: bearerAuthHook,
-      schema: {
-        // Inputs for the workflow are passed in the JSON body
-        body: z.object({
-          timeoutMinutes: z.string().default("5"),
-          workers: z.string().default('["zeus"]'),
-          arkivOpGeth: z.string().default("v1.101605.0-1.2"),
-          testLength: z.number().default(60),
-          blockEvery: z.number().default(1),
-          blockLimit: z.number().default(60000000),
-          testScenario: z.string().default("dc_write_only"),
-        }),
-        response: {
-          204: z.object({ message: z.string() }),
-          500: z.object({ error: z.string() }),
-        },
+  "/public/test/run",
+  {
+    preHandler: bearerAuthHook,
+    schema: {
+      // Inputs for the workflow are passed in the JSON body
+      body: z.object({
+        timeoutMinutes: z.string().default("5"),
+        workers: z.string().default('["zeus"]'),
+        arkivOpGeth: z.string().default("v1.101605.0-1.2"),
+        testLength: z.number().default(60),
+        blockEvery: z.number().default(1),
+        blockLimit: z.number().default(60000000),
+        testScenario: z.string().default("dc_write_only"),
+      }),
+      response: {
+        204: z.object({ message: z.string() }),
+        500: z.object({ error: z.string() }),
       },
     },
-    async (request, reply) => {
-      const inputs = request.body;
-      const actionName = "l2-arkiv.yml";
-      try {
-        await octokit.actions.createWorkflowDispatch({
-          owner: "salad-x-golem",
-          repo: "arkiv-setup",
-          workflow_id: actionName,
-          ref: "main", // or request.body.ref if you want it dynamic
-          inputs: {
-            ...inputs,
-            // Mapping the hyphenated YAML keys to the underscore-friendly Zod keys
-            "arkiv-op-geth": inputs.arkivOpGeth,
-            "test-length": inputs.testLength,
-            "block-every": inputs.blockEvery,
-            "block-limit": inputs.blockLimit,
-            "test-scenario": inputs.testScenario,
-          },
-        });
+  },
+  async (request, reply) => {
+    const inputs = request.body;
+    const actionName = "l2-arkiv.yml";
+    try {
+      await octokit.actions.createWorkflowDispatch({
+        owner: "salad-x-golem",
+        repo: "arkiv-setup",
+        workflow_id: actionName,
+        ref: "main", // or request.body.ref if you want it dynamic
+        inputs: {
+          ...inputs,
+          // Mapping the hyphenated YAML keys to the underscore-friendly Zod keys
+          "arkiv-op-geth": inputs.arkivOpGeth,
+          "test-length": inputs.testLength,
+          "block-every": inputs.blockEvery,
+          "block-limit": inputs.blockLimit,
+          "test-scenario": inputs.testScenario,
+        },
+      });
 
-        return reply.code(204).send({
-          message: `Workflow ${actionName} triggered successfully`
-        });
-      } catch (error: any) {
-        return reply.code(500).send({ error: `Failed to trigger workflow ${error}` });
-      }
+      return reply.code(204).send({
+        message: `Workflow ${actionName} triggered successfully`,
+      });
+    } catch (error: any) {
+      return reply
+        .code(500)
+        .send({ error: `Failed to trigger workflow ${error}` });
     }
+  },
 );
 
 // 4. Get Info
@@ -234,18 +235,24 @@ app.get(
 
 // Download file by id
 app.get(
-  "/public/file/:id/download",
+  "/public/file/:uid/download",
   {
     schema: {
-      params: z.object({ id: z.string() }),
+      params: z.object({ uid: z.string() }),
     },
   },
   async (req, reply) => {
-    const { id } = req.params as { id: string };
+    const { uid } = req.params as { uid: string };
 
-    // Support numeric IDs and string/UUID IDs
-    const numericId = /^\d+$/.test(id) ? Number(id) : undefined;
-    const where: any = numericId !== undefined ? { id: numericId } : { id };
+    // Only uuid format is supported
+    const uuidTest =
+      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+        uid,
+      );
+    if (!uuidTest) {
+      return reply.status(400).send({ error: "Invalid file ID format" });
+    }
+    const where: any = { uid: uid };
 
     const file = await prisma.file.findUnique({ where });
     if (!file) return reply.status(404).send({ error: "File not found" });
@@ -266,55 +273,65 @@ app.get(
 
 // Download file by id
 app.get(
-    "/public/file/:id/view",
-    {
-      schema: {
-        params: z.object({ id: z.string() }),
-      },
+  "/public/file/:uid/view",
+  {
+    schema: {
+      params: z.object({ uid: z.string() }),
     },
-    async (req, reply) => {
-      const { id } = req.params as { id: string };
+  },
+  async (req, reply) => {
+    const { uid } = req.params as { uid: string };
 
-      // Support numeric IDs and string/UUID IDs
-      const numericId = /^\d+$/.test(id) ? Number(id) : undefined;
-      const where: any = numericId !== undefined ? { id: numericId } : { id };
+    // Only uuid format is supported
+    const uuidTest =
+      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+        uid,
+      );
+    if (!uuidTest) {
+      return reply.status(400).send({ error: "Invalid file ID format" });
+    }
+    const where: any = { uid: uid };
 
-      const file = await prisma.file.findUnique({ where });
-      if (!file) return reply.status(404).send({ error: "File not found" });
+    const file = await prisma.file.findUnique({ where });
+    if (!file) return reply.status(404).send({ error: "File not found" });
 
-      if (!fs.existsSync(file.path)) {
-        return reply.status(404).send({ error: "File is missing on disk" });
-      }
+    if (!fs.existsSync(file.path)) {
+      return reply.status(404).send({ error: "File is missing on disk" });
+    }
 
-      const filename = file.originalName
-          ? path.basename(file.originalName)
-          : path.basename(file.path);
-      reply.header("Content-Type", "text/html; charset=utf-8");
-      reply.header("Content-Disposition", `inline; filename="${filename}"`);
+    const filename = file.originalName
+      ? path.basename(file.originalName)
+      : path.basename(file.path);
+    reply.header("Content-Type", "text/html; charset=utf-8");
+    reply.header("Content-Disposition", `inline; filename="${filename}"`);
 
-      const stream = fs.createReadStream(file.path);
-      return reply.send(stream);
-    },
+    const stream = fs.createReadStream(file.path);
+    return reply.send(stream);
+  },
 );
 
-app.get("/public/test/list", { preHandler: bearerAuthHook }, async (req, reply) => {
-  const tests = await prisma.test.findMany({
-    include: { files: true },
-    orderBy: { createdAt: "desc" },
-  });
-  return tests.map((t) => ({
-    id: t.id,
-    name: t.name,
-    createdAt: t.createdAt,
-    startedAt: t.startedAt,
-    finishedAt: t.finishedAt,
-    params: t.parameters,
-    files: t.files.map((f) => ({
-      id: f.id,
-      originalName: f.originalName,
-    })),
-  }));
-});
+app.get(
+  "/public/test/list",
+  { preHandler: bearerAuthHook },
+  async (req, reply) => {
+    const tests = await prisma.test.findMany({
+      include: { files: true },
+      orderBy: { createdAt: "desc" },
+    });
+    return tests.map((t) => ({
+      id: t.id,
+      name: t.name,
+      createdAt: t.createdAt,
+      startedAt: t.startedAt,
+      finishedAt: t.finishedAt,
+      params: t.parameters,
+      files: t.files.map((f) => ({
+        id: f.id,
+        originalName: f.originalName,
+      })),
+    }));
+  },
+);
 app
   .listen({ host: "0.0.0.0", port: 3000 })
   .then(() => console.log("Server running on port 3000"));
