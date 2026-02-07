@@ -151,10 +151,13 @@ app.post("/test/:name/upload/file", async (req, reply) => {
   const filePath = path.join(testDir, filename);
   await pipeline(data.file, fs.createWriteStream(filePath));
 
+  const stat = fs.statSync(filePath);
+
   await prisma.file.create({
     data: {
       originalName: data.filename,
       path: filePath,
+      size: stat.size,
       testId: test.id,
       uid: randomUUID(),
     },
@@ -335,6 +338,7 @@ app.get(
       files: t.files.map((f) => ({
         id: f.id,
         originalName: f.originalName,
+        size: f.size,
       })),
     }));
   },
