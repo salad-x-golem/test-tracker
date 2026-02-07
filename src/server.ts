@@ -177,6 +177,10 @@ app.post(
         blockEvery: z.number().default(1),
         blockLimit: z.number().default(60000000),
         testScenario: z.string().default("dc_write_only"),
+        testUsers: z.number().default(20),
+        isExternal: z.boolean().default(false),
+        externalRpcUrl: z.string().default("https://kaolin.hoodi.arkiv.network/rpc"),
+
       }),
       response: {
         204: z.object({ message: z.string() }),
@@ -194,13 +198,16 @@ app.post(
         workflow_id: actionName,
         ref: "main", // or request.body.ref if you want it dynamic
         inputs: {
-          ...inputs,
-          // Mapping the hyphenated YAML keys to the underscore-friendly Zod keys
+          "timeout-minutes": inputs.timeoutMinutes.toString(),
+          "workers": inputs.workers.toString(),
           "arkiv-op-geth": inputs.arkivOpGeth,
-          "test-length": inputs.testLength,
-          "block-every": inputs.blockEvery,
-          "block-limit": inputs.blockLimit,
+          "test-length": inputs.testLength.toString(),
+          "block-every": inputs.blockEvery.toString(),
+          "block-limit": inputs.blockLimit.toString(),
           "test-scenario": inputs.testScenario,
+          "test-users": inputs.testUsers.toString(),
+          "is-external": inputs.isExternal.toString(),
+          "external-rpc-url": inputs.externalRpcUrl,
         },
       });
 
