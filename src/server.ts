@@ -1,4 +1,4 @@
-import Fastify from "fastify";
+import Fastify, { FastifyRequest, FastifyReply } from "fastify";
 import { z } from "zod";
 import {
   serializerCompiler,
@@ -15,6 +15,26 @@ import { Octokit } from "@octokit/rest";
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 const upload_path = process.env.UPLOAD_PATH || path.join(__dirname, "uploads");
+const bearerToken = process.env.BEARER_TOKEN;
+
+async function bearerAuthHook(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  if (!bearerToken) {
+    return reply
+      .code(401)
+      .send({ error: "Authentication is not configured" });
+  }
+  const auth = request.headers.authorization;
+  if (!auth || !auth.startsWith("Bearer ")) {
+    return reply.code(401).send({ error: "Missing or invalid authorization header" });
+  }
+  const token = auth.slice(7);
+  if (token !== bearerToken) {
+    return reply.code(401).send({ error: "Invalid token" });
+  }
+}
 
 try {
   if (!fs.existsSync(upload_path)) {
@@ -141,6 +161,7 @@ app.post("/test/:name/upload/file", async (req, reply) => {
 app.post(
     "/public/test/run",
     {
+      preHandler: bearerAuthHook,
       schema: {
         // Inputs for the workflow are passed in the JSON body
         body: z.object({
@@ -191,6 +212,7 @@ app.post(
 app.get(
   "/public/test/:name/info",
   {
+    preHandler: bearerAuthHook,
     schema: {
       params: z.object({ name: z.string() }),
     },
@@ -269,7 +291,7 @@ app.get(
     },
 );
 
-app.get("/public/test/list", async (req, reply) => {
+app.get("/public/test/list", { preHandler: bearerAuthHook }, async (req, reply) => {
   const tests = await prisma.test.findMany({
     include: { files: true },
     orderBy: { createdAt: "desc" },
