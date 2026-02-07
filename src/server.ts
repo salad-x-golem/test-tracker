@@ -174,7 +174,7 @@ app.post(
       // Inputs for the workflow are passed in the JSON body
       body: z.object({
         timeoutMinutes: z.string().default("5"),
-        workers: z.string().default('["zeus"]'),
+        worker: z.string().default('zeus'),
         arkivOpGeth: z.string().default("v1.101605.0-1.2"),
         testLength: z.number().default(60),
         blockEvery: z.number().default(1),
@@ -202,7 +202,7 @@ app.post(
         ref: "main", // or request.body.ref if you want it dynamic
         inputs: {
           "timeout-minutes": inputs.timeoutMinutes.toString(),
-          "workers": inputs.workers.toString(),
+          "worker": inputs.worker.toString(),
           "arkiv-op-geth": inputs.arkivOpGeth,
           "test-length": inputs.testLength.toString(),
           "block-every": inputs.blockEvery.toString(),
