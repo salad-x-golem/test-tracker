@@ -14,6 +14,7 @@ CREATE TABLE "File" (
     "uid" TEXT NOT NULL,
     "originalName" TEXT NOT NULL,
     "path" TEXT NOT NULL,
+    "size" INTEGER NOT NULL DEFAULT 0,
     "testId" INTEGER NOT NULL,
     CONSTRAINT "File_testId_fkey" FOREIGN KEY ("testId") REFERENCES "Test" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
