@@ -70,7 +70,7 @@ app.post(
 
 // 1. Start Test
 app.post(
-  "/public/test/start",
+  "/test/start",
   {
     schema: {
       body: z.object({ name: z.string() }),
