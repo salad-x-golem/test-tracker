@@ -208,7 +208,7 @@ app.post(
   },
   async (request, reply) => {
     const inputs = request.body;
-    const actionName = "l2-arkiv.yml";
+    const actionName = "arkiv-system-test.yml";
     try {
       await octokit.actions.createWorkflowDispatch({
         owner: "salad-x-golem",
