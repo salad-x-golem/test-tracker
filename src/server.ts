@@ -9,6 +9,7 @@ import multipart from "@fastify/multipart";
 import fs from "node:fs";
 import path from "node:path";
 import { pipeline } from "node:stream/promises";
+import { timingSafeEqual } from "node:crypto";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { PrismaClient } from "./generated/client.js";
 import { Octokit } from "@octokit/rest";
@@ -30,8 +31,13 @@ async function bearerAuthHook(
   if (!auth || !auth.startsWith("Bearer ")) {
     return reply.code(401).send({ error: "Missing or invalid authorization header" });
   }
-  const token = auth.slice(7);
-  if (token !== bearerToken) {
+  const token = auth.slice("Bearer ".length);
+  const tokenBuffer = Buffer.from(token);
+  const expectedBuffer = Buffer.from(bearerToken);
+  if (
+    tokenBuffer.length !== expectedBuffer.length ||
+    !timingSafeEqual(tokenBuffer, expectedBuffer)
+  ) {
     return reply.code(401).send({ error: "Invalid token" });
   }
 }
