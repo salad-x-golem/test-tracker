@@ -85,6 +85,7 @@ export const FileScalarFieldEnum = {
   uid: 'uid',
   originalName: 'originalName',
   path: 'path',
+  size: 'size',
   testId: 'testId'
 } as const
 
