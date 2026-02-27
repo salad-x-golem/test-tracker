@@ -16,6 +16,29 @@ import { Octokit } from "@octokit/rest";
 import { randomUUID } from "node:crypto";
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+
+const mimeTypes: Record<string, string> = {
+  ".html": "text/html; charset=utf-8",
+  ".htm": "text/html; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".txt": "text/plain; charset=utf-8",
+  ".csv": "text/csv; charset=utf-8",
+  ".xml": "application/xml; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".pdf": "application/pdf",
+};
+
+function getContentType(filename: string): string {
+  const ext = path.extname(filename).toLowerCase();
+  return mimeTypes[ext] || "application/octet-stream";
+}
 const upload_path = process.env.UPLOAD_PATH || path.join(__dirname, "uploads");
 const bearerToken = process.env.BEARER_TOKEN;
 
@@ -328,7 +351,7 @@ app.get(
     const filename = file.originalName
       ? path.basename(file.originalName)
       : path.basename(file.path);
-    reply.header("Content-Type", "text/html; charset=utf-8");
+    reply.header("Content-Type", getContentType(filename));
     reply.header("Content-Disposition", `inline; filename="${filename}"`);
 
     const stream = fs.createReadStream(file.path);
